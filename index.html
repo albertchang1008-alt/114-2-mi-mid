@@ -1,7 +1,3 @@
-
-
-
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -34,9 +30,6 @@
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-gray-800">
-    <!-- Tailwind Safelist 確保顏色能正常動態載入 -->
-    <!-- text-pink-600 text-sky-600 text-blue-600 text-green-600 text-orange-600 text-purple-600 text-yellow-600 text-red-600 text-gray-600 text-gray-800
-         border-pink-100 border-sky-100 border-blue-100 border-green-100 border-orange-100 border-purple-100 border-yellow-100 border-red-100 border-gray-300 border-gray-200 -->
     <div class="max-w-3xl mx-auto px-4 py-8 md:py-12" id="app">
         
         <header class="text-center mb-8">
@@ -63,12 +56,12 @@
             <h2 class="text-xl font-semibold mb-6 text-center text-gray-700">學生登入</h2>
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1">姓名</label>
-                    <input type="text" id="input-name" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="請輸入姓名">
+                    <label class="block text-sm font-medium text-gray-600 mb-1">學號</label>
+                    <input type="text" id="input-id" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="請輸入完整學號，例如：113510629">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1">學號</label>
-                    <input type="text" id="input-id" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="請輸入學號">
+                    <label class="block text-sm font-medium text-gray-600 mb-1">姓名</label>
+                    <input type="text" id="input-name" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="請輸入姓名">
                 </div>
                 <button onclick="handleLogin()" class="w-full bg-medical-blue hover-bg-medical-blue text-white font-semibold rounded-lg px-4 py-3 mt-4 transition duration-200">進入系統</button>
             </div>
@@ -272,11 +265,25 @@
         function handleLogin() {
             const nameInput = document.getElementById("input-name").value.trim();
             const idInput = document.getElementById("input-id").value.trim();
+            const errorMsg = document.getElementById("login-error");
+
+            // 1. 檢查是否漏填
             if (!nameInput || !idInput) {
-                document.getElementById("login-error").classList.remove("hidden");
+                errorMsg.textContent = "請完整填寫學號與姓名！";
+                errorMsg.classList.remove("hidden");
                 return;
             }
-            document.getElementById("login-error").classList.add("hidden");
+            
+            // 2. 檢查學號長度 (設定小於 8 碼就擋下來)
+            if (idInput.length < 8) {
+                errorMsg.textContent = "請輸入完整的學號，例如：113510629";
+                errorMsg.classList.remove("hidden");
+                return;
+            }
+
+            // 驗證通過，隱藏錯誤訊息並繼續
+            errorMsg.classList.add("hidden");
+            
             studentName = nameInput;
             studentId = idInput;
             document.getElementById("display-user-name").textContent = studentName;
