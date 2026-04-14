@@ -1,11 +1,11 @@
-
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>動態題庫測驗</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <!-- 將原本的 link 替換為 script，啟用 Tailwind 最新版，支援 rose, sky, slate 等顏色 -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .bg-medical-pink { background-color: #fce7f3; }
         .text-medical-pink { color: #db2777; }
@@ -104,10 +104,20 @@
                 </div>
                 <p id="result-message" class="text-xl font-medium text-pink-600 mb-8">-</p>
                 <p id="save-status" class="text-sm text-blue-600 mb-4 font-medium"></p>
-                <div class="flex flex-col sm:flex-row justify-center gap-4">
-                    <button id="btn-retry" onclick="startRetry()" class="hidden bg-orange-400 hover:bg-orange-500 text-white font-semibold rounded-lg px-6 py-3 transition">針對錯題重做</button>
-                    <button onclick="startFullQuiz(currentSelectedTopic)" class="bg-medical-blue hover-bg-medical-blue text-white font-semibold rounded-lg px-6 py-3 transition">重新完整測驗</button>
-                    <button onclick="backToTopics()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg px-6 py-3 transition">回單元列表</button>
+                
+                <!-- 完全套用您提供的成功範例排版結構與精準顏色 -->
+                <div class="flex flex-col gap-3 justify-center mt-8 max-w-sm mx-auto">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button id="btn-retry" onclick="startRetry()" class="hidden flex-1 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3.5 px-6 rounded-xl transition-colors duration-200 shadow-md shadow-rose-200">
+                            錯題重做
+                        </button>
+                        <button onclick="startFullQuiz(currentSelectedTopic)" class="flex-1 bg-sky-500 hover:bg-sky-600 text-white font-bold py-3.5 px-6 rounded-xl transition-colors duration-200 shadow-md shadow-sky-200">
+                            重新完整測驗
+                        </button>
+                    </div>
+                    <button onclick="backToTopics()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3.5 px-6 rounded-xl transition-colors duration-200">
+                        回單元列表
+                    </button>
                 </div>
             </div>
 
@@ -338,7 +348,6 @@
             
             let questions = [];
             if (topic === "綜合練習") {
-                // 替換掉可能報錯的 ES6 展開語法
                 questions = allQuestionsData.slice();
                 shuffleArray(questions);
                 questions = questions.slice(0, Math.min(30, questions.length));
@@ -350,6 +359,7 @@
             prepareQuiz(questions);
         }
 
+        // 錯題重做的主要功能函數
         function startRetry() {
             isRetryMode = true;
             attemptCount++;
@@ -362,11 +372,9 @@
         function prepareQuiz(sourceQuestions) {
             // 根據 Source 創建乾淨的 Session
             quizSession = sourceQuestions.map(sourceQ => {
-                // 將該題有效選項拿出來洗牌，替換掉可能報錯的 ES6 展開語法
                 let optsToShuffle = sourceQ.originalOptions.slice();
                 shuffleArray(optsToShuffle);
 
-                // 追蹤洗牌後，正確答案移動到了哪一個新 index
                 const newCorrectIdx = optsToShuffle.findIndex(o => o.originalIndex === sourceQ.correctOriginalIndex);
 
                 return {
@@ -374,11 +382,8 @@
                     top: sourceQ.top,
                     q: sourceQ.q,
                     exp: sourceQ.exp,
-                    // 畫面顯示用的選項純文字
                     shuffledOptionsText: optsToShuffle.map(o => o.text), 
-                    // 絕對對齊的正確解答索引
                     shuffledCorrectIndex: newCorrectIdx,                 
-                    
                     userSelectedIndex: null,
                     isCorrectlyAnswered: false
                 };
@@ -409,9 +414,8 @@
                 const btn = document.createElement("button");
                 btn.className = "option-btn w-full text-left bg-gray-50 border border-gray-200 hover:bg-pink-50 hover:border-pink-300 text-gray-700 font-medium rounded-xl p-4";
                 
-                // 去除可能自帶的 A. B. C. D. 或 1. 2. 3. 4. 等前綴，且不再額外加上 index + 1
-                const cleanOptText = optText.replace(/^([1-4]|[A-D])[.\-、\s]*/i, '');
-                btn.textContent = cleanOptText;
+                // 不額外加上 1. 2. 3. 4. 編號，且完全保留您原始的選項文字
+                btn.textContent = optText;
                 
                 btn.onclick = function() { handleOptionClick(this, index, qData); };
                 container.appendChild(btn);
@@ -426,7 +430,6 @@
             clickedBtn.classList.add("option-selected");
             qData.userSelectedIndex = selectedIndex;
 
-            // 核心修正三：直接比對洗牌後的索引，100% 精準無誤
             if (selectedIndex === qData.shuffledCorrectIndex) {
                 scoreCorrect++;
                 qData.isCorrectlyAnswered = true;
@@ -466,8 +469,14 @@
             else if (scoreCalc >= 60) { msgEl.textContent = "👍 及格了，但還有進步空間喔！"; msgEl.className = "text-xl font-bold text-yellow-600 mb-8"; }
             else { msgEl.textContent = "💪 別氣餒，看看下方解析再試一次吧！"; msgEl.className = "text-xl font-bold text-pink-600 mb-8"; }
 
+            // 移除舊的 inline style，改用乾淨的 class 切換
             const retryBtn = document.getElementById("btn-retry");
-            retryBtn.classList.toggle("hidden", wrongCount === 0);
+            if (wrongCount > 0) {
+                retryBtn.classList.remove("hidden");
+                retryBtn.textContent = `錯題重做`;
+            } else {
+                retryBtn.classList.add("hidden");
+            }
 
             renderReviewList();
 
@@ -482,7 +491,7 @@
             });
         }
 
-        // 修改後的解析渲染函數
+        // 解析渲染函數
         function renderReviewList() {
             const reviewContainer = document.getElementById("review-answers-container");
             const reviewList = document.getElementById("review-answers-list");
@@ -495,7 +504,6 @@
                 // 動態生成所有選項的 HTML
                 let optionsHtml = '<div class="space-y-2 mb-4 pl-1">';
                 q.shuffledOptionsText.forEach((optText, optIdx) => {
-                    const cleanOptText = optText.replace(/^([1-4]|[A-D])[.\-、\s]*/i, '');
                     let textColorClass = "text-gray-800"; // 預設顯示黑色
                     let prefixHtml = `<span class="inline-block w-6 text-center text-gray-400 mr-1 font-normal">•</span>`;
                     let suffixHtml = ``;
@@ -516,7 +524,7 @@
                         suffixHtml = ` <span class="text-red-500 text-sm ml-2 font-normal">(你的作答)</span>`;
                     }
 
-                    optionsHtml += `<div class="${textColorClass} flex items-start"><div class="shrink-0">${prefixHtml}</div><div>${cleanOptText}${suffixHtml}</div></div>`;
+                    optionsHtml += `<div class="${textColorClass} flex items-start"><div class="shrink-0">${prefixHtml}</div><div>${optText}${suffixHtml}</div></div>`;
                 });
                 optionsHtml += '</div>';
 
