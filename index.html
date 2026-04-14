@@ -1,10 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>動態題庫測驗</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <style>
         .bg-medical-pink { background-color: #fce7f3; }
         .text-medical-pink { color: #db2777; }
@@ -24,26 +25,25 @@
             border-radius: 50%;
             width: 40px; height: 40px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 15px auto;
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-gray-800">
+<body class="bg-gray-50 min-h-screen text-gray-800">
     <div class="max-w-3xl mx-auto px-4 py-8 md:py-12" id="app">
         
         <header class="text-center mb-8">
             <h1 id="main-title" class="text-3xl md:text-4xl font-bold text-medical-pink mb-2">載入中...</h1>
         </header>
 
-        <!-- Loading -->
         <section id="loading-section" class="bg-white rounded-2xl shadow-sm border border-pink-100 p-10 mx-auto max-w-md text-center">
-            <div class="loader"></div>
+            <div class="flex justify-center items-center gap-3 mb-4">
+                <div class="loader" style="margin: 0;"></div>
+            </div>
             <h2 class="text-lg font-semibold text-gray-700">正在連接雲端題庫...</h2>
-            <p class="text-sm text-gray-500 mt-2">請確保您的 Google Sheet 格式正確</p>
+            <p class="text-sm text-gray-500 mt-2">請確保您的 Google Sheet 格式正確</p>    
         </section>
 
-        <!-- 錯誤提示 -->
         <section id="error-section" class="hidden bg-red-50 rounded-2xl shadow-sm border border-red-200 p-10 mx-auto max-w-md text-center">
             <svg class="w-12 h-12 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <h2 class="text-lg font-bold text-red-700 mb-2">系統發生錯誤</h2>
@@ -51,24 +51,22 @@
             <button onclick="fetchQuestionBank()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-medium transition">重新嘗試</button>
         </section>
 
-        <!-- 登入 -->
         <section id="login-section" class="hidden bg-white rounded-2xl shadow-sm border border-pink-100 p-6 md:p-10 mx-auto max-w-md">
             <h2 class="text-xl font-semibold mb-6 text-center text-gray-700">學生登入</h2>
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1">學號</label>
-                    <input type="text" id="input-id" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="請輸入完整學號，例如：113510629">
+                    <input type="text" id="input-id" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="請輸入完整學號，例如：113510629">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1">姓名</label>
-                    <input type="text" id="input-name" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="請輸入姓名">
+                    <input type="text" id="input-name" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="請輸入姓名">
                 </div>
                 <button onclick="handleLogin()" class="w-full bg-medical-blue hover-bg-medical-blue text-white font-semibold rounded-lg px-4 py-3 mt-4 transition duration-200">進入系統</button>
             </div>
-            <p id="login-error" class="text-red-500 text-sm mt-3 text-center hidden">請完整填寫姓名與學號！</p>
+            <p id="login-error" class="text-red-500 text-sm mt-3 text-center hidden">請完整填寫學號與姓名！</p>
         </section>
 
-        <!-- 單元選擇 -->
         <section id="topic-section" class="hidden bg-white rounded-2xl shadow-sm border border-pink-100 p-6 md:p-10">
             <div class="text-center mb-6">
                 <p class="text-lg text-gray-600">歡迎，<span id="display-user-name" class="font-bold text-medical-pink"></span> 同學</p>
@@ -77,7 +75,6 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="topic-list"></div>
         </section>
 
-        <!-- 測驗作答 -->
         <section id="quiz-section" class="hidden bg-white rounded-2xl shadow-sm border border-pink-100 p-6 md:p-10">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
                 <h3 id="quiz-topic-title" class="text-lg font-semibold text-medical-pink">測驗單元</h3>
@@ -89,7 +86,6 @@
             <div id="options-container" class="space-y-3"></div>
         </section>
 
-        <!-- 成績與解析 -->
         <section id="result-section" class="hidden">
             <div class="bg-white rounded-2xl shadow-sm border border-pink-100 p-6 md:p-10 text-center mb-6">
                 <h2 class="text-gray-500 font-medium mb-2">測驗結果</h2>
@@ -98,7 +94,7 @@
                     <span id="result-id" class="text-lg text-gray-500">-</span>
                 </div>
                 <div class="flex flex-wrap justify-center gap-2 mb-6">
-                    <span id="tag-mode-top" class="bg-sky-100 text-sky-800 px-4 py-1.5 rounded-full text-sm font-medium border border-sky-200">測驗模式</span>
+                    <span id="tag-mode-top" class="bg-blue-100 text-blue-800 px-4 py-1.5 rounded-full text-sm font-medium border border-blue-200">測驗模式</span>
                     <span id="tag-attempt" class="bg-pink-100 text-pink-800 px-4 py-1.5 rounded-full text-sm font-medium border border-pink-200">測驗次數：第 X 次</span>
                 </div>
                 <div class="text-7xl font-bold text-medical-blue mb-4" id="result-score">0</div>
@@ -107,7 +103,7 @@
                     <div>答錯：<span id="result-wrong" class="font-bold text-red-500 text-xl">0</span> 題</div>
                 </div>
                 <p id="result-message" class="text-xl font-medium text-pink-600 mb-8">-</p>
-                <p id="save-status" class="text-sm text-sky-600 mb-4 font-medium"></p>
+                <p id="save-status" class="text-sm text-blue-600 mb-4 font-medium"></p>
                 <div class="flex flex-col sm:flex-row justify-center gap-4">
                     <button id="btn-retry" onclick="startRetry()" class="hidden bg-orange-400 hover:bg-orange-500 text-white font-semibold rounded-lg px-6 py-3 transition">針對錯題重做</button>
                     <button onclick="startFullQuiz(currentSelectedTopic)" class="bg-medical-blue hover-bg-medical-blue text-white font-semibold rounded-lg px-6 py-3 transition">重新完整測驗</button>
@@ -116,7 +112,7 @@
             </div>
 
             <div id="review-answers-container" class="hidden bg-white rounded-2xl shadow-sm border border-pink-100 p-6 md:p-10">
-                <h3 class="text-xl font-bold text-sky-600 mb-6 flex items-center border-b pb-3">
+                <h3 class="text-xl font-bold text-blue-600 mb-6 flex items-center border-b pb-3">
                     <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                     本次測驗完整解析
                 </h3>
@@ -219,9 +215,9 @@
                                 correctIdx = parseInt(upperAns) - 1;
                             } else {
                                 // 模糊比對 (去除選項前綴的 A. 1. 等符號)
-                                const cleanAns = ansStr.replace(/^([1-4]|[A-D])[\.\-、\s]*/i, '').trim().toLowerCase();
+                                const cleanAns = ansStr.replace(/^([1-4]|[A-D])[.\-、\s]*/i, '').trim().toLowerCase();
                                 const match = validOptions.find(o => {
-                                    const cleanOpt = o.text.replace(/^([1-4]|[A-D])[\.\-、\s]*/i, '').trim().toLowerCase();
+                                    const cleanOpt = o.text.replace(/^([1-4]|[A-D])[.\-、\s]*/i, '').trim().toLowerCase();
                                     return cleanOpt === cleanAns || o.text.toLowerCase() === ansStr.toLowerCase();
                                 });
                                 if (match) correctIdx = match.originalIndex;
@@ -328,8 +324,8 @@
             });
 
             const btnAll = document.createElement("button");
-            btnAll.className = "md:col-span-2 text-center bg-sky-50 border-2 border-sky-200 hover:border-sky-400 hover:bg-sky-100 p-4 rounded-xl shadow-sm transition duration-200 text-sky-700 font-bold text-lg mt-2";
-            btnAll.innerHTML = "🏆 綜合練習 <span class='text-sm font-normal text-sky-600 block mt-1'>打亂所有章節，隨機抽取 50 題</span>";
+            btnAll.className = "md:col-span-2 text-center bg-blue-50 border-2 border-blue-200 hover:border-blue-400 hover:bg-blue-100 p-4 rounded-xl shadow-sm transition duration-200 text-blue-700 font-bold text-lg mt-2";
+            btnAll.innerHTML = "🏆 綜合練習 <span class='text-sm font-normal text-blue-600 block mt-1'>打亂所有章節，隨機抽取 30 題</span>";
             btnAll.onclick = () => startFullQuiz("綜合練習");
             topicListDiv.appendChild(btnAll);
         }
@@ -342,9 +338,10 @@
             
             let questions = [];
             if (topic === "綜合練習") {
-                questions = [...allQuestionsData];
+                // 替換掉可能報錯的 ES6 展開語法
+                questions = allQuestionsData.slice();
                 shuffleArray(questions);
-                questions = questions.slice(0, Math.min(50, questions.length));
+                questions = questions.slice(0, Math.min(30, questions.length));
             } else {
                 questions = allQuestionsData.filter(q => q.top === topic);
             }
@@ -365,8 +362,8 @@
         function prepareQuiz(sourceQuestions) {
             // 根據 Source 創建乾淨的 Session
             quizSession = sourceQuestions.map(sourceQ => {
-                // 將該題有效選項拿出來洗牌
-                let optsToShuffle = [...sourceQ.originalOptions];
+                // 將該題有效選項拿出來洗牌，替換掉可能報錯的 ES6 展開語法
+                let optsToShuffle = sourceQ.originalOptions.slice();
                 shuffleArray(optsToShuffle);
 
                 // 追蹤洗牌後，正確答案移動到了哪一個新 index
@@ -381,6 +378,7 @@
                     shuffledOptionsText: optsToShuffle.map(o => o.text), 
                     // 絕對對齊的正確解答索引
                     shuffledCorrectIndex: newCorrectIdx,                 
+                    
                     userSelectedIndex: null,
                     isCorrectlyAnswered: false
                 };
@@ -410,7 +408,11 @@
             qData.shuffledOptionsText.forEach((optText, index) => {
                 const btn = document.createElement("button");
                 btn.className = "option-btn w-full text-left bg-gray-50 border border-gray-200 hover:bg-pink-50 hover:border-pink-300 text-gray-700 font-medium rounded-xl p-4";
-                btn.textContent = `${index + 1}. ${optText}`;
+                
+                // 去除可能自帶的 A. B. C. D. 或 1. 2. 3. 4. 等前綴，且不再額外加上 index + 1
+                const cleanOptText = optText.replace(/^([1-4]|[A-D])[.\-、\s]*/i, '');
+                btn.textContent = cleanOptText;
+                
                 btn.onclick = function() { handleOptionClick(this, index, qData); };
                 container.appendChild(btn);
             });
@@ -460,7 +462,7 @@
 
             const msgEl = document.getElementById("result-message");
             if (scoreCalc === 100) { msgEl.textContent = "🏆 完美！你已經完全掌握了！"; msgEl.className = "text-xl font-bold text-green-600 mb-8"; }
-            else if (scoreCalc >= 80) { msgEl.textContent = "🌟 非常優秀！繼續保持！"; msgEl.className = "text-xl font-bold text-sky-600 mb-8"; }
+            else if (scoreCalc >= 80) { msgEl.textContent = "🌟 非常優秀！繼續保持！"; msgEl.className = "text-xl font-bold text-blue-600 mb-8"; }
             else if (scoreCalc >= 60) { msgEl.textContent = "👍 及格了，但還有進步空間喔！"; msgEl.className = "text-xl font-bold text-yellow-600 mb-8"; }
             else { msgEl.textContent = "💪 別氣餒，看看下方解析再試一次吧！"; msgEl.className = "text-xl font-bold text-pink-600 mb-8"; }
 
@@ -470,7 +472,7 @@
             renderReviewList();
 
             document.getElementById("save-status").textContent = "正在將成績同步至雲端...";
-            document.getElementById("save-status").className = "text-sm text-sky-600 mb-4 font-medium";
+            document.getElementById("save-status").className = "text-sm text-blue-600 mb-4 font-medium";
             sendDataToGAS({
                 action: "submitScore",
                 name: studentName, studentId: studentId,
@@ -480,6 +482,7 @@
             });
         }
 
+        // 修改後的解析渲染函數
         function renderReviewList() {
             const reviewContainer = document.getElementById("review-answers-container");
             const reviewList = document.getElementById("review-answers-list");
@@ -488,13 +491,35 @@
             
             quizSession.forEach((q, idx) => {
                 const isCorrect = q.isCorrectlyAnswered;
-                // 解析畫面直接拿取洗牌後的精準選項字串
-                const exactCorrectText = q.shuffledOptionsText[q.shuffledCorrectIndex];
-                const cleanCorrectAns = exactCorrectText ? exactCorrectText.replace(/^([1-4]|[A-D])[\.\-、\s]*/i, '') : "系統找不到答案";
-                
-                const exactUserText = q.userSelectedIndex !== null ? q.shuffledOptionsText[q.userSelectedIndex] : "未作答";
-                const cleanUserAns = exactUserText.replace(/^([1-4]|[A-D])[\.\-、\s]*/i, '');
-                
+
+                // 動態生成所有選項的 HTML
+                let optionsHtml = '<div class="space-y-2 mb-4 pl-1">';
+                q.shuffledOptionsText.forEach((optText, optIdx) => {
+                    const cleanOptText = optText.replace(/^([1-4]|[A-D])[.\-、\s]*/i, '');
+                    let textColorClass = "text-gray-800"; // 預設顯示黑色
+                    let prefixHtml = `<span class="inline-block w-6 text-center text-gray-400 mr-1 font-normal">•</span>`;
+                    let suffixHtml = ``;
+
+                    if (optIdx === q.shuffledCorrectIndex) {
+                        // 正確答案：綠色
+                        textColorClass = "text-green-700 font-semibold";
+                        prefixHtml = `<span class="inline-block w-6 text-center text-green-600 mr-1">✓</span>`;
+                        if (optIdx === q.userSelectedIndex) {
+                            suffixHtml = ` <span class="text-green-600 text-sm ml-2 font-normal">(正確答案 / 你的作答)</span>`;
+                        } else {
+                            suffixHtml = ` <span class="text-green-600 text-sm ml-2 font-normal">(正確答案)</span>`;
+                        }
+                    } else if (optIdx === q.userSelectedIndex) {
+                        // 學生答錯的選項：紅色
+                        textColorClass = "text-red-600 font-semibold";
+                        prefixHtml = `<span class="inline-block w-6 text-center text-red-500 mr-1">✗</span>`;
+                        suffixHtml = ` <span class="text-red-500 text-sm ml-2 font-normal">(你的作答)</span>`;
+                    }
+
+                    optionsHtml += `<div class="${textColorClass} flex items-start"><div class="shrink-0">${prefixHtml}</div><div>${cleanOptText}${suffixHtml}</div></div>`;
+                });
+                optionsHtml += '</div>';
+
                 const div = document.createElement("div");
                 div.className = isCorrect ? "bg-green-50 p-5 rounded-xl border border-green-200" : "bg-red-50 p-5 rounded-xl border border-red-200";
                 div.innerHTML = `
@@ -502,10 +527,9 @@
                         ${isCorrect ? '✅ 答對' : '❌ 答錯'}
                     </div>
                     <div class="font-bold text-gray-800 text-lg mb-3"><span class="text-gray-500 text-sm mr-1">Q${idx + 1}.</span>${q.q}</div>
-                    ${!isCorrect ? `<div class="text-red-600 font-semibold mb-1"><span class="text-red-400">你的作答：</span>${cleanUserAns}</div>` : ''}
-                    <div class="text-green-700 font-semibold mb-4"><span class="text-green-600">正確答案：</span>${cleanCorrectAns}</div>
+                    ${optionsHtml}
                     <div class="text-gray-700 text-sm md:text-base leading-relaxed bg-white/60 p-4 rounded-lg shadow-sm">
-                        <span class="font-bold text-sky-600">💡 解析：</span>${q.exp} 
+                        <span class="font-bold text-blue-600">💡 解析：</span>${q.exp} 
                         <span class="text-xs text-gray-400 block mt-2 pt-2 border-t border-gray-100">(${q.top})</span>
                     </div>
                 `;
